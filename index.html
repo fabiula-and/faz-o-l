@@ -1,0 +1,176 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>FAZ O L — Simulador de Urna</title>
+
+    <!-- Estilos -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <!-- Áudios -->
+    <audio id="audio-tecla" preload="auto"></audio>
+    <audio id="audio-confirma" preload="auto"></audio>
+
+    <!-- Container da urna -->
+    <main class="urna-casing p-4 md:p-8 rounded-lg flex flex-col md:flex-row gap-6 max-w-4xl w-full">
+
+        <!-- Tela -->
+        <section class="screen-bg w-full md:w-[500px] h-[400px] p-6 relative flex flex-col justify-between">
+
+            <div id="screen-content" class="h-full flex flex-col">
+
+                <!-- Cabeçalho -->
+                <div class="flex justify-between items-start mb-4 h-16">
+                    <div id="voto-para-text" class="text-sm font-bold uppercase hidden">
+                        Seu voto para
+                    </div>
+
+                    <div id="cargo-text" class="text-2xl font-bold uppercase text-center w-full mt-4">
+                        Presidente
+                    </div>
+                </div>
+
+                <!-- Números e informações -->
+                <div class="flex-grow flex gap-4">
+
+                    <div class="flex-grow">
+
+                        <div class="flex items-center gap-2 mb-4">
+                            <span class="text-sm font-bold w-20">Número:</span>
+
+                            <div class="flex gap-1" id="number-container">
+                                <div class="number-box blink" id="num-0"></div>
+                                <div class="number-box" id="num-1"></div>
+                            </div>
+                        </div>
+
+                        <!-- Informações do candidato -->
+                        <div id="candidate-info" class="hidden flex-col gap-2 mt-4 text-sm font-bold">
+                            <div class="flex gap-2">
+                                <span class="w-20 font-normal">Nome:</span>
+                                <span id="candidate-name" class="uppercase"></span>
+                            </div>
+
+                            <div class="flex gap-2">
+                                <span class="w-20 font-normal">Partido:</span>
+                                <span id="candidate-party" class="uppercase"></span>
+                            </div>
+
+                            <div class="flex gap-2">
+                                <span class="w-20 font-normal">Vice:</span>
+                                <span id="candidate-vice" class="uppercase"></span>
+                            </div>
+                        </div>
+
+                        <!-- Voto nulo -->
+                        <div id="null-vote-info" class="hidden mt-8 text-2xl font-bold text-center uppercase blink">
+                            Voto Nulo
+                        </div>
+
+                        <!-- Voto em branco -->
+                        <div id="blank-vote-info" class="hidden mt-8 text-2xl font-bold text-center uppercase blink">
+                            Voto em Branco
+                        </div>
+
+                    </div>
+
+                    <!-- Fotografia do candidato -->
+                    <div id="candidate-photo" class="hidden w-28 h-36 border-2 border-gray-400 p-1 flex-col items-center justify-end text-xs text-center font-bold">
+
+                        <img
+                            id="photo-img"
+                            src="assets/images/lula.jpg"
+                            alt="Foto do candidato"
+                            class="w-full h-full object-cover mb-1 bg-gray-200"
+                        >
+
+                        <span>Presidente</span>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Tela de encerramento -->
+            <div id="fim-screen" class="hidden absolute inset-0 bg-white">
+                <div class="fim-text">FIM</div>
+            </div>
+
+            <!-- Instruções -->
+            <div id="instructions" class="border-t-2 border-gray-800 pt-2 mt-2 hidden">
+                <div class="text-xs uppercase">Aperte a tecla:</div>
+                <div class="text-xs uppercase ml-4">
+                    <strong>Verde</strong> para CONFIRMAR este voto
+                </div>
+                <div class="text-xs uppercase ml-4">
+                    <strong>Laranja</strong> para REINICIAR este voto
+                </div>
+            </div>
+
+        </section>
+
+        <!-- Teclado -->
+        <section class="keyboard-bg w-full md:w-[320px] rounded p-6 shadow-xl flex flex-col justify-between">
+
+            <div class="flex justify-between items-center mb-6 px-4 text-white text-xs font-bold uppercase tracking-widest">
+                <span>Justiça</span>
+                <span>Eleitoral</span>
+            </div>
+
+            <!-- Teclas numéricas -->
+            <div class="grid grid-cols-3 gap-4 mb-6 px-4">
+
+                <button class="num-btn rounded h-12" onclick="typeNumber('1')">1</button>
+                <button class="num-btn rounded h-12" onclick="typeNumber('2')">2</button>
+                <button class="num-btn rounded h-12" onclick="typeNumber('3')">3</button>
+
+                <button class="num-btn rounded h-12" onclick="typeNumber('4')">4</button>
+                <button class="num-btn rounded h-12" onclick="typeNumber('5')">5</button>
+                <button class="num-btn rounded h-12" onclick="typeNumber('6')">6</button>
+
+                <button class="num-btn rounded h-12" onclick="typeNumber('7')">7</button>
+                <button class="num-btn rounded h-12" onclick="typeNumber('8')">8</button>
+                <button class="num-btn rounded h-12" onclick="typeNumber('9')">9</button>
+
+                <div></div>
+                <button class="num-btn rounded h-12" onclick="typeNumber('0')">0</button>
+                <div></div>
+
+            </div>
+
+            <!-- Teclas de ação -->
+            <div class="flex justify-between items-end gap-2 h-16">
+
+                <button class="action-btn btn-branco flex-1 h-12 rounded"
+                    onclick="voteBlank()">
+                    Branco
+                </button>
+
+                <button class="action-btn btn-corrige flex-1 h-12 rounded"
+                    onclick="resetScreen()">
+                    Corrige
+                </button>
+
+                <button class="action-btn btn-confirma flex-1 h-16 rounded"
+                    onclick="confirmVote()">
+                    Confirma
+                </button>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Lógica da urna -->
+    <script src="js/urna.js"></script>
+
+</body>
+</html>
